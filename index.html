@@ -59,7 +59,6 @@
         .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; transform: translateX(5px); }
         .nav-item.active { background: var(--accent); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
         
-        /* Gaya khusus buat tombol presensi */
         .nav-item.presensi { background: rgba(34, 197, 94, 0.1); color: var(--success); border: 1px dashed var(--success); margin-top: 1rem; }
         .nav-item.presensi:hover { background: var(--success); color: white; }
 
@@ -171,12 +170,12 @@
 </div>
 
 <script>
-    // Konfigurasi RPS dan Guru Pengampu
+    // Konfigurasi RPS, Guru, dan Mapel (FIXED NAMES)
     const rpsConfig = {
-        "RPS 1": { pc: "32 PC", teachers: ["Pak Gunawan", "Pak Herman"], mapels: ["Infrastruktur Awan", "Sistem Operasi"] },
+        "RPS 1": { pc: "32 PC", teachers: ["Pak Gunawan", "Pak Cahyo"], mapels: ["Infrastruktur Komputasi Awan", "LKA"] },
         "RPS 2": { pc: "32 PC", teachers: ["Pak Idiarso"], mapels: ["SKJ"] },
-        "RPS Jaringan": { pc: "36 PC", teachers: ["Pak Kuntoro"], mapels: ["KIK", "Layanan Jaringan"] },
-        "RPS Konsorsium": { pc: "36 PC", teachers: ["Pak Eko", "Pak Cahyo"], mapels: ["LKA", "Game Dev"] },
+        "RPS Jaringan": { pc: "36 PC", teachers: ["Pak Kuntoro"], mapels: ["KIK"] },
+        "RPS Coding": { pc: "36 PC", teachers: ["Pak Eko"], mapels: ["Game"] },
         "RPS IoT Lab": { pc: "24 PC", teachers: ["Pak Aji"], mapels: ["IoT"] }
     };
 
@@ -190,16 +189,14 @@
         Object.keys(rpsConfig).forEach((rps, idx) => {
             const config = rpsConfig[rps];
             const g1 = config.teachers[0];
-            const g2 = config.teachers[1] || config.teachers[0];
             const m1 = config.mapels[0];
-            const m2 = config.mapels[1] || config.mapels[0];
 
             schedule[rps] = [
                 { time: "07:00-10:00", class: rotatedClasses[idx], mapel: m1, guru: g1, type: "sija" },
                 { time: "10:00-10:15", class: "BREAK 1", mapel: "Istirahat", guru: "-", type: "break" },
-                { time: "10:15-11:45", class: rotatedClasses[(idx + 4) % 9], mapel: m1, guru: g1, type: "sija" },
+                { time: "10:15-11:45", class: rotatedClasses[(idx + 3) % 9], mapel: m1, guru: g1, type: "sija" },
                 { time: "11:45-12:15", class: "ISHOMA", mapel: "Istirahat", guru: "-", type: "break" },
-                { time: "12:15-15:30", class: rotatedClasses[(idx + 7) % 9], mapel: m2, guru: g2, type: "sija" }
+                { time: "12:15-15:30", class: rotatedClasses[(idx + 6) % 9], mapel: m1, guru: g1, type: "sija" }
             ];
         });
         return schedule;
@@ -218,7 +215,7 @@
             let sessions = '';
             data[rps].forEach(s => {
                 sessions += `
-                    <div class="schedule-item ${s.type}" onclick="event.stopPropagation(); showDetail('${rps}', '${s.class}', '${s.guru}')">
+                    <div class="schedule-item ${s.type}" onclick="event.stopPropagation(); showDetail('${rps}', '${s.class}', '${s.guru}', '${s.mapel}')">
                         <span class="time-tag">🕒 ${s.time}</span>
                         <span class="class-tag">${s.class}</span>
                         <span class="mapel-tag">${s.mapel} ${s.guru !== '-' ? '| ' + s.guru : ''}</span>
@@ -231,7 +228,7 @@
                         <strong>${rps}</strong>
                         <div class="hardware-info">
                             <div class="stat-box stat-ready">${rpsConfig[rps].pc}</div>
-                            <div class="stat-box stat-guru">Online</div>
+                            <div class="stat-box stat-guru">Monitoring</div>
                         </div>
                     </div>
                     <div class="card-body"><div class="schedule-list">${sessions}</div></div>
@@ -239,12 +236,13 @@
         });
     }
 
-    function showDetail(rps, kelas, guru) {
+    function showDetail(rps, kelas, guru, mapel) {
         document.getElementById('m-title').innerText = rps;
         document.getElementById('m-content').innerHTML = `
-            <p style="margin-bottom: 0.5rem"><b>Kelas Aktif:</b> ${kelas}</p>
-            <p style="margin-bottom: 0.5rem"><b>Pengampu:</b> ${guru}</p>
-            <p><b>Status:</b> Terhubung ke Monitoring System</p>
+            <p style="margin-bottom: 0.5rem"><b>Kelas:</b> ${kelas}</p>
+            <p style="margin-bottom: 0.5rem"><b>Mata Pelajaran:</b> ${mapel}</p>
+            <p style="margin-bottom: 0.5rem"><b>Guru:</b> ${guru}</p>
+            <p><b>Status:</b> Monitoring Aktif</p>
         `;
         document.getElementById('overlay').style.display = 'block';
         document.getElementById('modal').style.display = 'block';
