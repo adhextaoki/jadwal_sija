@@ -170,13 +170,21 @@
 </div>
 
 <script>
-    // Konfigurasi RPS, Guru, dan Mapel (FIXED NAMES)
+    // Konfigurasi RPS, Guru, dan Mapel sesuai instruksi Oki (FIXED)
     const rpsConfig = {
-        "RPS 1": { pc: "32 PC", teachers: ["Pak Gunawan", "Pak Cahyo"], mapels: ["Infrastruktur Komputasi Awan", "LKA"] },
-        "RPS 2": { pc: "32 PC", teachers: ["Pak Idiarso"], mapels: ["SKJ"] },
-        "RPS Jaringan": { pc: "36 PC", teachers: ["Pak Kuntoro"], mapels: ["KIK"] },
-        "RPS Coding": { pc: "36 PC", teachers: ["Pak Eko"], mapels: ["Game"] },
-        "RPS IoT Lab": { pc: "24 PC", teachers: ["Pak Aji"], mapels: ["IoT"] }
+        "RPS 1": { 
+            pc: "32 PC", 
+            teachers: ["Pak Gunawan", "Pak Herman"], 
+            mapels: ["Infrastruktur Komputasi Awan", "Layanan Komputasi Awan"] 
+        },
+        "RPS 2": { pc: "32 PC", teachers: ["Pak Idiarso"], mapels: ["Sistem Keamanan Jaringan"] },
+        "RPS Jaringan": { pc: "36 PC", teachers: ["Pak Kuntoro"], mapels: ["Kreativitas Inovasi dan Kewirausahaan"] },
+        "RPS Coding": { 
+            pc: "36 PC", 
+            teachers: ["Pak Cahyo", "Pak Eko"], 
+            mapels: ["Platform Komputasi Awan", "Game"] 
+        },
+        "RPS IoT Lab": { pc: "24 PC", teachers: ["Pak Aji"], mapels: ["Internet Of Thing"] }
     };
 
     const allClasses = ["XII SIJA 1", "XII SIJA 2", "XII SIJA 3", "XI SIJA 1", "XI SIJA 2", "XI SIJA 3", "X PPLG 1", "X PPLG 2", "X PPLG 3"];
@@ -188,15 +196,18 @@
         let schedule = {};
         Object.keys(rpsConfig).forEach((rps, idx) => {
             const config = rpsConfig[rps];
-            const g1 = config.teachers[0];
-            const m1 = config.mapels[0];
+            
+            // Logika selang-seling untuk RPS yang punya 2 guru
+            const tIdx = dayIdx % (config.teachers.length);
+            const currentGuru = config.teachers[tIdx] || config.teachers[0];
+            const currentMapel = config.mapels[tIdx] || config.mapels[0];
 
             schedule[rps] = [
-                { time: "07:00-10:00", class: rotatedClasses[idx], mapel: m1, guru: g1, type: "sija" },
+                { time: "07:00-10:00", class: rotatedClasses[idx], mapel: currentMapel, guru: currentGuru, type: "sija" },
                 { time: "10:00-10:15", class: "BREAK 1", mapel: "Istirahat", guru: "-", type: "break" },
-                { time: "10:15-11:45", class: rotatedClasses[(idx + 3) % 9], mapel: m1, guru: g1, type: "sija" },
+                { time: "10:15-11:45", class: rotatedClasses[(idx + 3) % 9], mapel: currentMapel, guru: currentGuru, type: "sija" },
                 { time: "11:45-12:15", class: "ISHOMA", mapel: "Istirahat", guru: "-", type: "break" },
-                { time: "12:15-15:30", class: rotatedClasses[(idx + 6) % 9], mapel: m1, guru: g1, type: "sija" }
+                { time: "12:15-15:30", class: rotatedClasses[(idx + 6) % 9], mapel: currentMapel, guru: currentGuru, type: "sija" }
             ];
         });
         return schedule;
@@ -228,7 +239,7 @@
                         <strong>${rps}</strong>
                         <div class="hardware-info">
                             <div class="stat-box stat-ready">${rpsConfig[rps].pc}</div>
-                            <div class="stat-box stat-guru">Monitoring</div>
+                            <div class="stat-box stat-guru">Online</div>
                         </div>
                     </div>
                     <div class="card-body"><div class="schedule-list">${sessions}</div></div>
