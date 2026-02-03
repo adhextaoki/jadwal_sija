@@ -1,0 +1,277 @@
+<?php
+/**
+ * SIJA-OPS: Professional Monitoring Dashboard
+ * Status: Production Ready - Version 2.3
+ */
+?>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPS SIJA - Adhexta-Riyan</title>
+    <style>
+        :root {
+            --primary: #0f172a; 
+            --accent: #3b82f6; 
+            --success: #22c55e;
+            --warning: #f59e0b; 
+            --danger: #ef4444; 
+            --bg: #e2e8f0;
+            --sidebar-bg: #1e293b;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --item-3d-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: #334155;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            height: 100vh;
+            position: fixed;
+            padding: 2rem 1.5rem;
+            z-index: 100;
+            color: #f8fafc;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar h2 { font-size: 1.25rem; color: #fff; margin-bottom: 0.5rem; font-weight: 800; }
+        .sidebar .partner { font-size: 0.65rem; color: var(--accent); font-weight: 600; margin-bottom: 2rem; display: block; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: #64748b; margin: 1.5rem 0 0.5rem; display: block; font-weight: 700; }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: #94a3b8;
+            text-decoration: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; transform: translateX(5px); }
+        .nav-item.active { background: var(--accent); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
+
+        .content { margin-left: 260px; padding: 2rem; width: calc(100% - 260px); }
+        
+        .header-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.2rem 2rem;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .header-box h1 { font-size: 1.4rem; color: var(--primary); }
+        #clock { font-size: 1.6rem; font-weight: 800; color: var(--accent); display: block; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.2rem; }
+        
+        .card { 
+            background: #f8fafc; 
+            border-radius: 18px; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: var(--card-shadow);
+            border: 1px solid #cbd5e1;
+        }
+
+        .card-header { padding: 1.2rem; background: #fff; border-bottom: 1px solid #e2e8f0; }
+        .card-header strong { font-size: 1.1rem; color: var(--primary); display: block; margin-bottom: 0.5rem; }
+
+        .hardware-info { display: flex; gap: 0.5rem; }
+        .stat-box { flex: 1; padding: 0.4rem; border-radius: 8px; text-align: center; font-size: 0.7rem; font-weight: 700; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); }
+        .stat-ready { background: #dcfce7; color: #166534; }
+        .stat-guru { background: #dbeafe; color: #1e40af; }
+
+        .card-body { padding: 1rem; background: #f1f5f9; }
+        .schedule-list { display: flex; flex-direction: column; gap: 0.8rem; }
+        .schedule-item { 
+            padding: 0.9rem; 
+            background: #ffffff; 
+            border-radius: 12px; 
+            border-left: 4px solid #94a3b8;
+            box-shadow: var(--item-3d-shadow);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .schedule-item:hover { transform: translateY(-4px); box-shadow: 0 12px 20px -5px rgba(0,0,0,0.1); }
+        .schedule-item.sija { border-left-color: var(--accent); }
+        .schedule-item.break { background: #e2e8f0; border-left-color: #64748b; opacity: 0.8; }
+
+        .time-tag { font-size: 0.65rem; font-weight: 700; color: #64748b; display: block; margin-bottom: 0.2rem; }
+        .class-tag { font-size: 0.9rem; font-weight: 800; color: var(--primary); display: block; }
+        .mapel-tag { font-size: 0.75rem; color: #475569; display: block; margin-top: 0.1rem; }
+
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal { 
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            background: white; padding: 2rem; border-radius: 20px; z-index: 1001; width: 350px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>⚡ RPS SIJA</h2>
+    <span class="partner">System Monitoring Center</span>
+    
+    <span class="nav-label">Main View</span>
+    <div id="nav-Live" onclick="changeDay('Live')" class="nav-item">📅 Live Monitor</div>
+    
+    <span class="nav-label">Weekly Schedule</span>
+    <div id="nav-Senin" onclick="changeDay('Senin')" class="nav-item">Senin</div>
+    <div id="nav-Selasa" onclick="changeDay('Selasa')" class="nav-item">Selasa</div>
+    <div id="nav-Rabu" onclick="changeDay('Rabu')" class="nav-item">Rabu</div>
+    <div id="nav-Kamis" onclick="changeDay('Kamis')" class="nav-item">Kamis</div>
+    <div id="nav-Jumat" onclick="changeDay('Jumat')" class="nav-item">Jumat</div>
+</div>
+
+<div class="content">
+    <div class="header-box">
+        <div>
+            <h1 id="view-title">Dashboard</h1>
+            <p id="sub-title">Monitoring Aktifitas Ruang Praktik</p>
+        </div>
+        <div class="clock-box">
+            <span id="date">...</span>
+            <span id="clock">00:00:00</span>
+        </div>
+    </div>
+    <div class="grid" id="main-grid"></div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeModal()"></div>
+<div class="modal" id="modal">
+    <h3 id="m-title" style="margin-bottom: 1rem; border-bottom: 2px solid #eee; padding-bottom: 0.5rem;"></h3>
+    <div id="m-content"></div>
+    <button onclick="closeModal()" style="margin-top: 1.5rem; width: 100%; padding: 0.8rem; background: var(--primary); color: white; border: none; border-radius: 10px; cursor: pointer;">Tutup</button>
+</div>
+
+<script>
+    // Konfigurasi RPS dan Guru Pengampu sesuai request
+    const rpsConfig = {
+        "RPS 1": { pc: "32 PC", teachers: ["Pak Gunawan", "Pak Herman"], mapels: ["Infrastruktur Awan", "Sistem Operasi"] },
+        "RPS 2": { pc: "32 PC", teachers: ["Pak Idiarso"], mapels: ["SKJ"] },
+        "RPS Jaringan": { pc: "36 PC", teachers: ["Pak Kuntoro"], mapels: ["KIK", "Layanan Jaringan"] },
+        "RPS Konsorsium": { pc: "36 PC", teachers: ["Pak Eko", "Pak Cahyo"], mapels: ["LKA", "Game Dev"] },
+        "RPS IoT Lab": { pc: "24 PC", teachers: ["Pak Aji"], mapels: ["IoT"] }
+    };
+
+    const allClasses = ["XII SIJA 1", "XII SIJA 2", "XII SIJA 3", "XI SIJA 1", "XI SIJA 2", "XI SIJA 3", "X PPLG 1", "X PPLG 2", "X PPLG 3"];
+
+    function generateDailySchedule(dayIdx) {
+        let rotatedClasses = [...allClasses];
+        for (let i = 0; i < dayIdx; i++) { rotatedClasses.push(rotatedClasses.shift()); }
+
+        let schedule = {};
+        Object.keys(rpsConfig).forEach((rps, idx) => {
+            const config = rpsConfig[rps];
+            // Pembagian dinamis guru berdasarkan sesi (pagi/siang)
+            const g1 = config.teachers[0];
+            const g2 = config.teachers[1] || config.teachers[0];
+            const m1 = config.mapels[0];
+            const m2 = config.mapels[1] || config.mapels[0];
+
+            schedule[rps] = [
+                { time: "07:00-10:00", class: rotatedClasses[idx], mapel: m1, guru: g1, type: "sija" },
+                { time: "10:00-10:15", class: "BREAK 1", mapel: "Istirahat", guru: "-", type: "break" },
+                { time: "10:15-11:45", class: rotatedClasses[(idx + 4) % 9], mapel: m1, guru: g1, type: "sija" },
+                { time: "11:45-12:15", class: "ISHOMA", mapel: "Istirahat", guru: "-", type: "break" },
+                { time: "12:15-15:30", class: rotatedClasses[(idx + 7) % 9], mapel: m2, guru: g2, type: "sija" }
+            ];
+        });
+        return schedule;
+    }
+
+    function render(day) {
+        const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        let dayIdx = day === 'Live' ? new Date().getDay() : days.indexOf(day);
+        if (dayIdx === 0 || dayIdx === 6) dayIdx = 1;
+
+        const data = generateDailySchedule(dayIdx);
+        const grid = document.getElementById('main-grid');
+        grid.innerHTML = '';
+
+        Object.keys(data).forEach(rps => {
+            let sessions = '';
+            data[rps].forEach(s => {
+                sessions += `
+                    <div class="schedule-item ${s.type}" onclick="event.stopPropagation(); showDetail('${rps}', '${s.class}', '${s.guru}')">
+                        <span class="time-tag">🕒 ${s.time}</span>
+                        <span class="class-tag">${s.class}</span>
+                        <span class="mapel-tag">${s.mapel} ${s.guru !== '-' ? '| ' + s.guru : ''}</span>
+                    </div>`;
+            });
+
+            grid.innerHTML += `
+                <div class="card">
+                    <div class="card-header">
+                        <strong>${rps}</strong>
+                        <div class="hardware-info">
+                            <div class="stat-box stat-ready">${rpsConfig[rps].pc}</div>
+                            <div class="stat-box stat-guru">Online</div>
+                        </div>
+                    </div>
+                    <div class="card-body"><div class="schedule-list">${sessions}</div></div>
+                </div>`;
+        });
+    }
+
+    function showDetail(rps, kelas, guru) {
+        document.getElementById('m-title').innerText = rps;
+        document.getElementById('m-content').innerHTML = `
+            <p style="margin-bottom: 0.5rem"><b>Kelas Aktif:</b> ${kelas}</p>
+            <p style="margin-bottom: 0.5rem"><b>Pengampu:</b> ${guru}</p>
+            <p><b>Status:</b> Terhubung ke Monitoring System</p>
+        `;
+        document.getElementById('overlay').style.display = 'block';
+        document.getElementById('modal').style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('modal').style.display = 'none';
+    }
+
+    function changeDay(day) {
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        document.getElementById('nav-' + day).classList.add('active');
+        document.getElementById('view-title').innerText = day === 'Live' ? 'Live Monitor' : 'Jadwal ' + day;
+        render(day);
+    }
+
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('clock').textContent = now.toLocaleTimeString('id-ID');
+        const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        document.getElementById('date').textContent = days[now.getDay()] + ", " + now.toLocaleDateString('id-ID');
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+    changeDay('Live');
+</script>
+</body>
+</html>
