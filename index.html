@@ -15,6 +15,9 @@
             --sidebar-bg: #1e293b;
             --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             --item-3d-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+            /* Warna Ungu buat Suport CS */
+            --purple-glow: rgba(139, 92, 246, 0.4);
+            --purple-accent: #8b5cf6;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -59,8 +62,12 @@
         .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; transform: translateX(5px); }
         .nav-item.active { background: var(--accent); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
         
+        /* Service Buttons */
         .nav-item.presensi { background: rgba(34, 197, 94, 0.1); color: var(--success); border: 1px dashed var(--success); margin-top: 1rem; }
         .nav-item.presensi:hover { background: var(--success); color: white; }
+
+        .nav-item.contact-admin { background: rgba(139, 92, 246, 0.1); color: #a78bfa; border: 1px dashed var(--purple-accent); margin-top: 0.5rem; }
+        .nav-item.contact-admin:hover { background: var(--purple-accent); color: white; box-shadow: 0 4px 15px var(--purple-glow); }
 
         .content { margin-left: 260px; padding: 2rem; width: calc(100% - 260px); }
         
@@ -146,6 +153,7 @@
 
     <span class="nav-label">Services</span>
     <a href="https://adhextaoki.github.io/presensi_digital/" target="_blank" class="nav-item presensi">📝 Presensi Digital</a>
+    <a href="https://adhextaoki.github.io/contact-cs/" target="_blank" class="nav-item contact-admin">🎧 Suport CS - RPS SIJA</a>
 </div>
 
 <div class="content">
@@ -170,7 +178,6 @@
 </div>
 
 <script>
-    // Konfigurasi RPS, Guru, dan Mapel sesuai instruksi Oki (FIXED)
     const rpsConfig = {
         "RPS 1": { 
             pc: "32 PC", 
@@ -196,8 +203,6 @@
         let schedule = {};
         Object.keys(rpsConfig).forEach((rps, idx) => {
             const config = rpsConfig[rps];
-            
-            // Logika selang-seling untuk RPS yang punya 2 guru
             const tIdx = dayIdx % (config.teachers.length);
             const currentGuru = config.teachers[tIdx] || config.teachers[0];
             const currentMapel = config.mapels[tIdx] || config.mapels[0];
